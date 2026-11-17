@@ -8,3 +8,7 @@ app.listen(3000, () => {
 app.get('/', (req, res) => {
     res.send("Hii, How are you?");
 })
+
+app.post('/api/cars', (req, res) => {
+    
+})
