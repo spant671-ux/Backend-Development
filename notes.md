@@ -161,19 +161,32 @@ TCP ensures that data packets are delivered reliably, in order, and without loss
 Located in [`01/server.js`](file:///c:/Personal/Code/Backend%20Development/01/server.js):
 
 ```javascript
+//step 1: create a folder
+//step 2: move into that folder
+//step 3: npm init -y
+//step 4: open folder using VS Code
+//step 5: npm i express
+//step 6: create server.js
+
+//Server Instantiate
 const express = require('express');
 const app = express();
 
+//Activate the server on 3000 port
 app.listen(3000, () => {
     console.log("Server started at port:3000");  
 })
 
+//Routes
 app.get('/', (req, res) => {
     res.send("Hii, How are you?");
 })
 
 app.post('/api/cars', (req, res) => {
-    
+    const {name, brand} = req.body;
+    console.log(name);
+    console.log(brand);
+    res.send("Car submitted successfully.");
 })
 ```
 
@@ -189,27 +202,27 @@ app.post('/api/cars', (req, res) => {
    - Registers a route handler for `GET` requests hitting the root (`/`) path.
    - `res.send("Hii, How are you?")` sends a text response back to the client.
 5. **`app.post('/api/cars', (req, res) => { ... })`**
-   - Defines an endpoint that accepts incoming `POST` requests to create car data.
-   - Typically used in combination with body parsing middleware (`express.json()`) to extract data submitted in `req.body`.
+   - Defines an endpoint that accepts incoming `POST` requests.
+   - `req.body`: Contains key-value pairs of data submitted in the request payload.
+   - `const {name, brand} = req.body;`: Destructures the expected properties.
+   - ⚠️ **Important Gotcha with `req.body`**: In Express, `req.body` is `undefined` by default for incoming requests. To parse JSON bodies, you must add body-parsing middleware:
+     ```javascript
+     // Built into Express (or via body-parser package):
+     app.use(express.json());
+     ```
+     Without this middleware, reading `req.body` throws a `TypeError: Cannot destructure property 'name' of 'req.body' as it is undefined.`
 
 > **Best Practice Notice**:
-> In Express applications, it is standard convention to define all routes (`app.get`, `app.post`, etc.) **before** invoking `app.listen()`.
+> In Express applications, it is standard convention to define all middleware (`app.use`) and routes (`app.get`, `app.post`, etc.) **before** invoking `app.listen()`.
 
 ---
 
 ## 7. Setup & Running Commands
 
-1. **Initialize Project**:
-   ```bash
-   npm init -y
-   ```
-2. **Install Express**:
-   ```bash
-   npm install express
-   ```
-3. **Run the Server**:
-   ```bash
-   cd 01
-   node server.js
-   ```
-   *(Or run `node --watch server.js` to automatically reload the server on file edits).*
+### 6-Step Project Creation Workflow:
+1. **Create a folder**: `mkdir 01`
+2. **Move into that folder**: `cd 01`
+3. **Initialize package**: `npm init -y`
+4. **Open in code editor**: `code .`
+5. **Install Express**: `npm i express`
+6. **Create server file**: Create `server.js` and start it with `node server.js` (or `node --watch server.js`).
