@@ -12,7 +12,8 @@ A structured companion covering core backend concepts, networking fundamentals, 
 4. [HTTP Protocol, Methods & Idempotence](#4-http-protocol-methods--idempotence)
 5. [Express.js Fundamentals](#5-expressjs-fundamentals)
 6. [Code Implementation (`01/server.js`)](#6-code-implementation-01serverjs)
-7. [Setup & Running Commands](#7-setup--running-commands)
+7. [Testing POST Requests with Postman](#7-testing-post-requests-with-postman)
+8. [Setup & Running Commands](#8-setup--running-commands)
 
 ---
 
@@ -175,6 +176,12 @@ Located in [`01/server.js`](file:///c:/Personal/Code/Backend%20Development/01/se
 const express = require('express');
 const app = express();
 
+//Used to parse req.body in express -> PUT or POST
+const bodyParser = require('body-parser');
+
+//Specifically parse json data and add it to req.body object
+app.use(bodyParser.json());
+
 //Activate the server on 3000 port
 app.listen(3000, () => {
     console.log("Server started at port:3000");  
@@ -199,33 +206,80 @@ app.post('/api/cars', (req, res) => {
    - Imports the Express factory function from `node_modules`.
 2. **`const app = express();`**
    - Instantiates the Express application object that manages routes, middleware, and settings.
-3. **`app.listen(3000, callback)`**
+3. **`const bodyParser = require('body-parser');`**
+   - Imports the `body-parser` middleware library.
+4. **`app.use(bodyParser.json());`**
+   - Mounts the JSON parsing middleware into the Express request pipeline.
+   - **Why this is essential**: When a client sends a `POST` or `PUT` request with a JSON payload, raw HTTP sends it as a binary data stream. By default, Express leaves `req.body` as `undefined`. `bodyParser.json()` intercepts incoming requests, buffers the stream, parses the JSON string into a JavaScript object, and attaches it to **`req.body`**.
+5. **`app.listen(3000, callback)`**
    - Binds to TCP port `3000` and starts listening for incoming client connections.
-4. **`app.get('/', (req, res) => { ... })`**
+6. **`app.get('/', (req, res) => { ... })`**
    - Registers a route handler for `GET` requests hitting the root (`/`) path.
    - `res.send("Hii, How are you?")` sends a text response back to the client.
-5. **`app.post('/api/cars', (req, res) => { ... })`**
-   - Defines an endpoint that accepts incoming `POST` requests.
-   - `req.body`: Contains key-value pairs of data submitted in the request payload.
-   - `const {name, brand} = req.body;`: Destructures the expected properties.
-   - ⚠️ **Important Gotcha with `req.body`**: In Express, `req.body` is `undefined` by default for incoming requests. To parse JSON bodies, you must add body-parsing middleware:
-     ```javascript
-     // Built into Express (or via body-parser package):
-     app.use(express.json());
-     ```
-     Without this middleware, reading `req.body` throws a `TypeError: Cannot destructure property 'name' of 'req.body' as it is undefined.`
+7. **`app.post('/api/cars', (req, res) => { ... })`**
+   - Defines a `POST` endpoint to accept car data submitted in the request body.
+   - `const {name, brand} = req.body;`: Object destructuring to extract `name` and `brand`.
+   - `console.log(...)`: Outputs values to the server terminal.
+   - `res.send("Car submitted successfully.")`: Sends an acknowledgement response back to the client.
 
 > **Best Practice Notice**:
 > In Express applications, it is standard convention to define all middleware (`app.use`) and routes (`app.get`, `app.post`, etc.) **before** invoking `app.listen()`.
 
 ---
 
-## 7. Setup & Running Commands
+## 7. Testing POST Requests with Postman
 
-### 6-Step Project Creation Workflow:
+Since browsers can only trigger `GET` requests directly from the address bar, tools like **Postman** (or curl) are used to test `POST`, `PUT`, and `DELETE` endpoints.
+
+### Step-by-Step Testing Guide:
+
+1. **Start your server**:
+   ```bash
+   cd 01
+   node server.js
+   ```
+2. **Open Postman & Create a New Request**:
+   - **Method**: Select **`POST`** from the HTTP method dropdown.
+   - **URL**: Enter `http://localhost:3000/api/cars`.
+3. **Configure Request Body**:
+   - Navigate to the **`Body`** tab under the URL bar.
+   - Select the **`raw`** radio button.
+   - On the right-hand dropdown, change format from `Text` to **`JSON`** *(this automatically sets the `Content-Type: application/json` header)*.
+4. **Enter JSON Payload**:
+   ```json
+   {
+     "name": "Thar",
+     "brand": "Mahindra"
+   }
+   ```
+5. **Click `Send`**:
+   - **Server Terminal Output**:
+     ```text
+     Thar
+     Mahindra
+     ```
+   - **Postman Response Pane**:
+     ```text
+     Car submitted successfully.
+     ```
+   - **Status**: `200 OK`
+
+---
+
+## 8. Setup & Running Commands
+
+### Project Setup Workflow:
 1. **Create a folder**: `mkdir 01`
 2. **Move into that folder**: `cd 01`
 3. **Initialize package**: `npm init -y`
 4. **Open in code editor**: `code .`
-5. **Install Express**: `npm i express`
-6. **Create server file**: Create `server.js` and start it with `node server.js` (or `node --watch server.js`).
+5. **Install Express & Body-Parser**:
+   ```bash
+   npm i express body-parser
+   ```
+6. **Create server file**: Create `server.js` and start it:
+   ```bash
+   node server.js
+   # or with auto-reload:
+   node --watch server.js
+   ```
