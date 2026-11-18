@@ -1,6 +1,6 @@
 # 🌐 Backend Development Journey
 
-A complete hands-on journey mastering backend engineering with **Node.js, Express.js, MongoDB, and RESTful APIs** — from networking fundamentals and server setup to database integration and scalable production architectures.
+Welcome to my centralized Backend Development repository! This repository documents my hands-on journey mastering backend engineering with **Node.js, Express.js, MongoDB, RESTful APIs, and Production Architecture** — from initial server setup and networking fundamentals to database integration, authentication, and scalable APIs.
 
 ---
 
