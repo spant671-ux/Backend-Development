@@ -46,6 +46,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 7. **Middleware & Body Parsing** – Why `req.body` is `undefined` by default and how `body-parser` / `express.json()` parse incoming request streams.
 8. **API Testing with Postman** – Constructing `POST` requests, setting headers, transmitting JSON bodies, and inspecting server logs.
 9. **MongoDB Ecosystem (`mongosh` & Compass)** – Document databases vs SQL, BSON format, port `27017`, CLI shell management, and visual GUI inspection.
+10. **MongoDB CRUD Operations** – Document lifecycle: `insertOne`/`insertMany`, filtered queries with `find`/`findOne`, `$set` atomic updates, and `deleteOne`/`deleteMany`.
 
 ---
 

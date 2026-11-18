@@ -15,6 +15,7 @@ A structured companion covering core backend concepts, networking fundamentals, 
 7. [Testing POST Requests with Postman](#7-testing-post-requests-with-postman)
 8. [Setup & Running Commands](#8-setup--running-commands)
 9. [Introduction to MongoDB & Database Tools (mongosh & Compass)](#9-introduction-to-mongodb--database-tools-mongosh--compass)
+10. [MongoDB CRUD Operations (Create, Read, Update, Delete)](#10-mongodb-crud-operations-create-read-update-delete)
 
 ---
 
@@ -364,3 +365,110 @@ exit
 | **Interface** | Terminal / Command Line | Visual Desktop Application |
 | **Speed** | Ultra-fast, lightweight | Interactive, point-and-click |
 | **Best For** | Quick queries, debugging, automation | Visual inspection, schema analysis, data browsing |
+
+---
+
+## 10. MongoDB CRUD Operations (Create, Read, Update, Delete)
+
+CRUD is the foundation of all database interactions:
+
+| Operation | MongoDB Methods | Description |
+| :--- | :--- | :--- |
+| **C — Create** | `insertOne()`, `insertMany()` | Add new documents into a collection |
+| **R — Read** | `find()`, `findOne()` | Query and retrieve documents |
+| **U — Update** | `updateOne()`, `updateMany()` | Modify existing documents |
+| **D — Delete** | `deleteOne()`, `deleteMany()` | Remove documents from a collection |
+
+---
+
+### 1. Create (Insert)
+
+#### Insert a Single Document:
+```javascript
+db.cars.insertOne({
+  name: "Thar",
+  brand: "Mahindra",
+  price: 1500000
+});
+```
+
+#### Insert Multiple Documents:
+```javascript
+db.cars.insertMany([
+  { name: "Scorpio", brand: "Mahindra", price: 1800000 },
+  { name: "City", brand: "Honda", price: 1200000 },
+  { name: "Civic", brand: "Honda", price: 2200000 }
+]);
+```
+
+---
+
+### 2. Read (Query)
+
+#### Find All Documents:
+```javascript
+db.cars.find()
+```
+
+#### Find with Filter:
+```javascript
+// Find all cars made by Mahindra
+db.cars.find({ brand: "Mahindra" })
+```
+
+#### Find One Specific Document:
+```javascript
+// Returns the first document that matches
+db.cars.findOne({ name: "Thar" })
+```
+
+#### Pretty Print Formatting:
+```javascript
+db.cars.find().pretty()
+```
+
+---
+
+### 3. Update (Modify)
+
+> ⚠️ **Critical Rule**: Always use the **`$set`** update operator when modifying fields! If you omit `$set`, MongoDB will overwrite and replace the entire document with the new object.
+
+#### Update a Single Document:
+```javascript
+// Updates the first car named "Thar" with new price
+db.cars.updateOne(
+  { name: "Thar" },
+  { $set: { price: 1600000 } }
+);
+```
+
+#### Update Multiple Documents:
+```javascript
+// Adds inStock: true to all cars made by Mahindra
+db.cars.updateMany(
+  { brand: "Mahindra" },
+  { $set: { inStock: true } }
+);
+```
+
+---
+
+### 4. Delete (Remove)
+
+#### Delete a Single Document:
+```javascript
+// Deletes the first matching document
+db.cars.deleteOne({ name: "City" })
+```
+
+#### Delete Multiple Documents:
+```javascript
+// Deletes all cars made by Honda
+db.cars.deleteMany({ brand: "Honda" })
+```
+
+#### Delete All Documents in a Collection:
+```javascript
+// Warning: Clears all documents inside the collection
+db.cars.deleteMany({})
+```
