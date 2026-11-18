@@ -9,6 +9,12 @@
 const express = require('express');
 const app = express();
 
+//Used to parse req.body in express -> PUT or POST
+const bodyParser = require('body-parser');
+
+//Specifically parse json data and add it to req.body object
+app.use(bodyParser.json());
+
 //Activate the server on 3000 port
 app.listen(3000, () => {
     console.log("Server started at port:3000");  
