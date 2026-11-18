@@ -200,6 +200,12 @@ app.post('/api/cars', (req, res) => {
     console.log(brand);
     res.send("Car submitted successfully.");
 })
+
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://127.0.0.1:27017/Cars')
+  .then(() => {console.log("Connection successful!");})
+  .catch((error) => {console.log("Received an error:", error);});
 ```
 
 ### Breakdown of the Code:
@@ -223,6 +229,13 @@ app.post('/api/cars', (req, res) => {
    - `const {name, brand} = req.body;`: Object destructuring to extract `name` and `brand`.
    - `console.log(...)`: Outputs values to the server terminal.
    - `res.send("Car submitted successfully.")`: Sends an acknowledgement response back to the client.
+8. **`const mongoose = require('mongoose');`**
+   - Imports the Mongoose ODM library to connect Node.js to MongoDB.
+9. **`mongoose.connect('mongodb://127.0.0.1:27017/Cars')`**
+   - Connects asynchronously to the local MongoDB database named `Cars`.
+   - `.then()` executes on successful connection.
+   - `.catch(error)` catches and logs any connection errors.
+   - 💡 **Why `127.0.0.1` over `localhost`**: In Node.js 18+, `localhost` resolves to IPv6 `::1` first. Since MongoDB defaults to listening on IPv4, using `127.0.0.1` prevents `ECONNREFUSED` connection errors.
 
 > **Best Practice Notice**:
 > In Express applications, it is standard convention to define all middleware (`app.use`) and routes (`app.get`, `app.post`, etc.) **before** invoking `app.listen()`.
@@ -275,9 +288,9 @@ Since browsers can only trigger `GET` requests directly from the address bar, to
 2. **Move into that folder**: `cd 01`
 3. **Initialize package**: `npm init -y`
 4. **Open in code editor**: `code .`
-5. **Install Express & Body-Parser**:
+5. **Install Express, Body-Parser & Mongoose**:
    ```bash
-   npm i express body-parser
+   npm i express body-parser mongoose
    ```
 6. **Create server file**: Create `server.js` and start it:
    ```bash

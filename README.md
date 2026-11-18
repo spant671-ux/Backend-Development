@@ -22,7 +22,7 @@ Backend Development/
 ├── .gitignore                   # Global ignore file (node_modules, .env)
 ├── README.md                    # Repository documentation and module matrix
 ├── notes.md                     # Centralized comprehensive study handbook
-└── 01/                          # Module 01: Server setup, Express instance, body-parser & routing
+└── 01/                          # Module 01: Server setup, Express instance, body-parser, routing & Mongoose
     ├── package.json
     ├── package-lock.json
     └── server.js
@@ -34,7 +34,7 @@ Backend Development/
 
 All theoretical foundations, networking mechanisms, protocol lifecycle rules, code walkthroughs, and interview cheat sheets are documented in the centralized handbook:
 
-- 👉 **[📘 Centralized Handbook: notes.md](./notes.md)** — The complete reference guide covering backend architectures, DNS resolution, TCP three-way handshake, HTTP methods, idempotence, Express internals, and Postman testing.
+- 👉 **[📘 Centralized Handbook: notes.md](./notes.md)** — The complete reference guide covering backend architectures, DNS resolution, TCP three-way handshake, HTTP methods, idempotence, Express internals, Postman testing, MongoDB tooling, and CRUD operations.
 
 ### Key Conceptual Topics Covered:
 1. **What is Backend Development?** – Client-Server model, business logic execution, data persistence, and authorization boundaries.
@@ -47,14 +47,15 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 8. **API Testing with Postman** – Constructing `POST` requests, setting headers, transmitting JSON bodies, and inspecting server logs.
 9. **MongoDB Ecosystem (`mongosh` & Compass)** – Document databases vs SQL, BSON format, port `27017`, CLI shell management, and visual GUI inspection.
 10. **MongoDB CRUD Operations** – Document lifecycle: `insertOne`/`insertMany`, filtered queries with `find`/`findOne`, `$set` atomic updates, and `deleteOne`/`deleteMany`.
+11. **Database Connectivity with Mongoose** – `mongoose.connect()`, Promise-based handling, and IPv4 loopback (`127.0.0.1`) resolution in Node.js 18+.
 
 ---
 
 ## 📂 Projects & Modules Directory
 
-| # | Folder | Tech Stack | Description | Key Learnings |
-|---|---|---|---|---|
-| **01** | [`01`](./01) | Node.js, Express 5, Body-Parser | First Express server & API endpoints | `express()`, `app.listen()`, `GET /`, `POST /api/cars`, `bodyParser.json()`, `req.body`, Postman testing |
+| # | Folder | Tech Stack | Description | Key Learnings | Status |
+|---|---|---|---|---|---|
+| **01** | [`01`](./01) | Node.js, Express 5, Body-Parser, Mongoose, MongoDB | Express server, REST endpoints & MongoDB database connection | `express()`, `app.listen()`, `GET /`, `POST /api/cars`, `bodyParser.json()`, `req.body`, Postman testing, `mongoose.connect()`, `127.0.0.1` IPv4 loopback resolution | ✅ Completed |
 
 ---
 
@@ -62,9 +63,10 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (v18.x or later recommended)
+- [MongoDB Community Server](https://www.mongodb.com/try/download/community) & [MongoDB Compass](https://www.mongodb.com/try/download/compass)
 - [Postman](https://www.postman.com/) (or curl / Thunder Client) for API testing
 
-### Running a Specific Module
+### Running Module 01
 
 1. Clone the repository:
    ```bash
@@ -72,7 +74,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
    cd Backend-Development
    ```
 
-2. Navigate into the desired module folder (e.g., `01`):
+2. Navigate into the module folder:
    ```bash
    cd 01
    ```
@@ -82,7 +84,9 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
    npm install
    ```
 
-4. Start the server:
+4. Ensure your local MongoDB service is running (Port `27017`).
+
+5. Start the server:
    ```bash
    node server.js
    ```
@@ -91,8 +95,8 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
    node --watch server.js
    ```
 
-5. Test the server:
-   - **GET Route**: Open `http://localhost:3000` in your browser.
+6. Test the endpoints:
+   - **GET Route**: Open `http://localhost:3000` in your browser to see `"Hii, How are you?"`.
    - **POST Route**: Send a `POST` request to `http://localhost:3000/api/cars` via Postman with JSON body:
      ```json
      {
@@ -100,6 +104,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
        "brand": "Mahindra"
      }
      ```
+   - **Database Connection**: Terminal logs `"Server started at port:3000"` and `"Connection successful!"`.
 
 ---
 
@@ -108,6 +113,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 - **Runtime**: Node.js (V8 Engine & libuv)
 - **Framework**: Express.js
 - **Database**: MongoDB (NoSQL / BSON)
+- **ODM (Object Data Modeling)**: Mongoose
 - **Database Tooling**: `mongosh` (CLI), MongoDB Compass (GUI)
 - **Middleware**: `body-parser`
 - **Testing & Tooling**: Postman, Git & GitHub
