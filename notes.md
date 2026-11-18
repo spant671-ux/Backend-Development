@@ -1,6 +1,6 @@
 # 🛠️ Backend Development Handbook & Notes
 
-A structured companion covering core backend concepts, networking fundamentals, HTTP protocols, and Express.js implementations.
+A structured companion covering core backend concepts, networking fundamentals, HTTP protocols, Express.js implementations, and database tooling.
 
 ---
 
@@ -14,6 +14,7 @@ A structured companion covering core backend concepts, networking fundamentals, 
 6. [Code Implementation (`01/server.js`)](#6-code-implementation-01serverjs)
 7. [Testing POST Requests with Postman](#7-testing-post-requests-with-postman)
 8. [Setup & Running Commands](#8-setup--running-commands)
+9. [Introduction to MongoDB & Database Tools (mongosh & Compass)](#9-introduction-to-mongodb--database-tools-mongosh--compass)
 
 ---
 
@@ -283,3 +284,83 @@ Since browsers can only trigger `GET` requests directly from the address bar, to
    # or with auto-reload:
    node --watch server.js
    ```
+
+---
+
+## 9. Introduction to MongoDB & Database Tools (mongosh & Compass)
+
+### What is MongoDB?
+**MongoDB** is an open-source, NoSQL, document-oriented database. Instead of storing data in rigid rows and columns like traditional relational SQL databases, MongoDB stores records as flexible, JSON-like documents called **BSON** (Binary JSON).
+
+### SQL vs. MongoDB Terminology:
+
+| SQL (Relational) | MongoDB (NoSQL) | Description |
+| :--- | :--- | :--- |
+| **Database** | **Database** | Container for all collections / tables |
+| **Table** | **Collection** | Group of related documents |
+| **Row / Record** | **Document** | Individual data object (JSON/BSON) |
+| **Column** | **Field** | Key-value attribute within a document |
+| **Primary Key (`id`)** | **`_id` (ObjectId)** | Unique 12-byte hexadecimal identifier |
+
+---
+
+### Networking & Connection Defaults:
+- **Default Port**: `27017`
+- **Local Connection String (URI)**: `mongodb://127.0.0.1:27017` or `mongodb://localhost:27017`
+
+---
+
+### 1. `mongosh` (MongoDB Shell)
+`mongosh` is the modern, interactive **CLI (Command Line Interface)** to query, manage, and configure your MongoDB database directly from the terminal.
+
+#### Essential `mongosh` Commands:
+```bash
+# 1. Connect to local MongoDB instance
+mongosh
+
+# 2. View all databases
+show dbs
+
+# 3. Switch to (or create) a database
+use carsDatabase
+
+# 4. View collections in the current database
+show collections
+
+# 5. Insert a document into a collection
+db.cars.insertOne({ name: "Scorpio", brand: "Mahindra" })
+
+# 6. Read / find all documents in a collection
+db.cars.find()
+
+# 7. Exit the shell
+exit
+```
+
+---
+
+### 2. MongoDB Compass (GUI)
+**MongoDB Compass** is the official **Graphical User Interface (GUI)** for MongoDB. It lets you visually explore your databases without typing shell commands.
+
+#### How to Connect & Use Compass:
+1. Open **MongoDB Compass**.
+2. In the **New Connection** screen, use the default URI:
+   ```text
+   mongodb://localhost:27017
+   ```
+3. Click **Connect**.
+4. You can visually:
+   - Create new databases and collections.
+   - Insert, edit, clone, or delete JSON documents.
+   - Filter documents with visual queries (e.g., `{ brand: "Mahindra" }`).
+   - View document structure, field types, and collection storage size.
+
+---
+
+### Summary: `mongosh` vs. `Compass`
+
+| Feature | `mongosh` (CLI) | MongoDB Compass (GUI) |
+| :--- | :--- | :--- |
+| **Interface** | Terminal / Command Line | Visual Desktop Application |
+| **Speed** | Ultra-fast, lightweight | Interactive, point-and-click |
+| **Best For** | Quick queries, debugging, automation | Visual inspection, schema analysis, data browsing |

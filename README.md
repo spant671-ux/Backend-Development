@@ -45,6 +45,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 6. **Express.js Architecture** – Express factory, routing pipeline, and abstraction over Node's native `http` module.
 7. **Middleware & Body Parsing** – Why `req.body` is `undefined` by default and how `body-parser` / `express.json()` parse incoming request streams.
 8. **API Testing with Postman** – Constructing `POST` requests, setting headers, transmitting JSON bodies, and inspecting server logs.
+9. **MongoDB Ecosystem (`mongosh` & Compass)** – Document databases vs SQL, BSON format, port `27017`, CLI shell management, and visual GUI inspection.
 
 ---
 
@@ -105,6 +106,8 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 
 - **Runtime**: Node.js (V8 Engine & libuv)
 - **Framework**: Express.js
+- **Database**: MongoDB (NoSQL / BSON)
+- **Database Tooling**: `mongosh` (CLI), MongoDB Compass (GUI)
 - **Middleware**: `body-parser`
 - **Testing & Tooling**: Postman, Git & GitHub
 - **Package Manager**: npm
