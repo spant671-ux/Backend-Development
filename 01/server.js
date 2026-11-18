@@ -31,3 +31,10 @@ app.post('/api/cars', (req, res) => {
     console.log(brand);
     res.send("Car submitted successfully.");
 })
+
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/Cars', {
+    useNewurlParser:true,
+    useUnifiedTopology:true
+});
