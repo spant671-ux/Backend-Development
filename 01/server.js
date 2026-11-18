@@ -34,7 +34,6 @@ app.post('/api/cars', (req, res) => {
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/Cars', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect('mongodb://127.0.0.1:27017/Cars')
+  .then(() => {console.log("Connection successful!");})
+  .catch((error) => {console.log("Received an error:", error);});
