@@ -598,25 +598,57 @@ exports.createTodo = async (req, res) => {
 
 ---
 
-#### 3. The Traffic Cop: `02/routes/todos.js`
+#### 3. The Controller: Fetching All Todos (`02/controllers/getTodo.js`)
+To read documents from MongoDB, we use `Todo.find({})`. Passing an empty object `{}` tells Mongoose: *"find everything in this collection without filtering"*.
+
+```javascript
+const Todo = require("../models/Todo");
+
+exports.getTodo = async (req, res) => {
+    try {
+        // Fetch all todo documents from the database
+        const todos = await Todo.find({});
+
+        // Send response with the fetched array of todos
+        res.status(200).json({
+            success: true,
+            data: todos,
+            message: "Entire todo data is fetched!"
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            message: err.message
+        });
+    }
+};
+```
+
+---
+
+#### 4. The Traffic Cop: `02/routes/todos.js`
 Routes should remain completely clean and readable. They only map an endpoint to a controller:
 
 ```javascript
 const express = require("express");
 const router = express.Router();
 
-// Import controller function
+// Import controller functions
 const { createTodo } = require("../controllers/createTodo");
+const { getTodo } = require("../controllers/getTodo");
 
-// Map: POST /createTodo ➔ createTodo controller
-router.post("/createTodo", createTodo);
+// Define API routes
+router.post("/createTodo", createTodo); // Create new todo
+router.get("/getTodos", getTodo);       // Fetch all todos
 
 module.exports = router;
 ```
 
 ---
 
-#### 4. The Vault & Plumber: `.env` & `02/config/database.js`
+#### 5. The Vault & Plumber: `.env` & `02/config/database.js`
 **Rule**: Never commit database passwords or port numbers to public code.
 - `.env` stores environment variables:
   ```env
@@ -683,17 +715,15 @@ app.get("/", (req, res) => {
 
 | Step | Action | Detail |
 | :--- | :--- | :--- |
-| **Method** | Select `POST` | Because we are creating new data in the database. |
-| **URL** | `http://localhost:3000/api/v1/createTodo` | Combines base port `3000` + prefix `/api/v1` + route `/createTodo`. |
-| **Headers** | `Content-Type: application/json` | Tells Express that the incoming payload is JSON format. |
-| **Body** | Choose `raw` ➔ `JSON` | `{ "title": "Abir Pal", "description": "Hello Abir Pal" }` |
-| **Expected Response** | Status `200 OK` | Returns JSON containing `success: true`, the generated `_id`, and confirmation message. |
+| **POST /createTodo** | Select `POST` ➔ Body: `raw JSON` | `http://localhost:3000/api/v1/createTodo`<br>Creates and saves a new Todo in MongoDB. |
+| **GET /getTodos** | Select `GET` ➔ No Body | `http://localhost:3000/api/v1/getTodos`<br>Fetches and returns an array of all saved Todos. |
 
 ---
 
 ### 💡 Quick Interview & Handbook Cheat Sheet:
 1. **Why do we need MVC?** To achieve **Separation of Concerns**—keeping database logic, routing, and configurations independent so teams can scale code cleanly.
-2. **Why use `async / await` in controllers?** Because database queries are asynchronous. Without `await`, JavaScript moves to the next line before MongoDB finishes saving.
-3. **What does `express.json()` do?** It parses raw incoming request streams into a ready-to-use `req.body` object.
-4. **Why use `.env`?** Keeps sensitive credentials and environment configurations out of source code and version control.
+2. **Why use `async / await` in controllers?** Because database queries are asynchronous. Without `await`, JavaScript moves to the next line before MongoDB finishes saving or querying.
+3. **What does `Todo.find({})` do?** Passing an empty object `{}` tells Mongoose to query all documents in the collection without filtering.
+4. **What does `express.json()` do?** It parses raw incoming request streams into a ready-to-use `req.body` object.
+5. **Why use `.env`?** Keeps sensitive credentials and environment configurations out of source code and version control.
 
