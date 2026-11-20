@@ -669,18 +669,65 @@ const router = express.Router();
 // Import controller functions
 const { createTodo } = require("../controllers/createTodo");
 const { getTodo, getTodoById } = require("../controllers/getTodo");
+const { updateTodo } = require("../controllers/updateTodo");
 
 // Define API routes
-router.post("/createTodo", createTodo);    // Create new todo
-router.get("/getTodos", getTodo);          // Fetch all todos
-router.get("/getTodos/:id", getTodoById);  // Fetch single todo by ID (Dynamic Route Param)
+router.post("/createTodo", createTodo);       // Create new todo
+router.get("/getTodos", getTodo);             // Fetch all todos
+router.get("/getTodos/:id", getTodoById);     // Fetch single todo by ID
+router.put("/updateTodo/:id", updateTodo);    // Update existing todo by ID
 
 module.exports = router;
 ```
 
 ---
 
-#### 5. The Vault & Plumber: `.env` & `02/config/database.js`
+#### 5. The Controller: Updating a Todo (`02/controllers/updateTodo.js`)
+Updating needs both the **ID** (from the URL parameter `req.params`) and the **new data** (from the request body `req.body`).
+
+```javascript
+const Todo = require("../models/Todo");
+
+exports.updateTodo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description } = req.body;
+
+        const todo = await Todo.findByIdAndUpdate(
+            { _id: id },
+            { title, description, updatedAt: Date.now() }
+        );
+
+        res.status(200).json({
+            success: true,
+            data: todo,
+            message: "Updated successfully"
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            message: "Server Error"
+        });
+    }
+};
+```
+
+> ⚠️ **Crucial Mongoose Gotcha: Why did the response return the old data?**
+> By default, `Todo.findByIdAndUpdate()` returns the document **as it was before the update**. The database *was* updated, but the returned object is the old version.
+> To receive the newly updated document in the response, pass `{ new: true }`:
+> ```javascript
+> const todo = await Todo.findByIdAndUpdate(
+>     { _id: id },
+>     { title, description, updatedAt: Date.now() },
+>     { new: true } // Return the modified document instead of original!
+> );
+> ```
+
+---
+
+#### 6. The Vault & Plumber: `.env` & `02/config/database.js`
 **Rule**: Never commit database passwords or port numbers to public code.
 - `.env` stores environment variables:
   ```env
@@ -750,6 +797,7 @@ app.get("/", (req, res) => {
 | **POST /createTodo** | Select `POST` ➔ Body: `raw JSON` | `http://localhost:3000/api/v1/createTodo`<br>Creates and saves a new Todo in MongoDB. |
 | **GET /getTodos** | Select `GET` ➔ No Body | `http://localhost:3000/api/v1/getTodos`<br>Fetches and returns an array of all saved Todos. |
 | **GET /getTodos/:id** | Select `GET` ➔ URL Param | `http://localhost:3000/api/v1/getTodos/<id>`<br>Fetches a single Todo by its `_id`; returns `404` if not found. |
+| **PUT /updateTodo/:id** | Select `PUT` ➔ URL Param + Body | `http://localhost:3000/api/v1/updateTodo/<id>`<br>Updates title/description/updatedAt of the Todo. |
 
 ---
 
@@ -759,6 +807,7 @@ app.get("/", (req, res) => {
 3. **What does `Todo.find({})` do?** Passing an empty object `{}` tells Mongoose to query all documents in the collection without filtering.
 4. **How do Route Parameters (`req.params`) work?** When a route contains `:id` (e.g., `/getTodos/:id`), Express extracts the value from the URL path into `req.params.id`.
 5. **What should an API return when an ID does not exist?** HTTP status **`404 Not Found`** with a clear error message, rather than a generic `500 Server Error`.
-6. **What does `express.json()` do?** It parses raw incoming request streams into a ready-to-use `req.body` object.
-7. **Why use `.env`?** Keeps sensitive credentials and environment configurations out of source code and version control.
+6. **Why does `findByIdAndUpdate` return old data?** By default, Mongoose returns the original document before modification. Add `{ new: true }` to receive the updated document.
+7. **What does `express.json()` do?** It parses raw incoming request streams into a ready-to-use `req.body` object.
+8. **Why use `.env`?** Keeps sensitive credentials and environment configurations out of source code and version control.
 

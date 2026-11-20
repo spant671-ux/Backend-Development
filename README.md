@@ -66,7 +66,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 | # | Folder | Tech Stack | Description | Key Learnings | Status |
 |---|---|---|---|---|---|
 | **01** | [`01`](./01) | Node.js, Express 5, Body-Parser, Mongoose, MongoDB | Express server, REST endpoints & MongoDB database connection | `express()`, `app.listen()`, `GET /`, `POST /api/cars`, `bodyParser.json()`, `req.body`, Postman testing, `mongoose.connect()`, `127.0.0.1` IPv4 loopback resolution | ✅ Completed |
-| **02** | [`02`](./02) | Node.js, Express, Mongoose, MongoDB, Dotenv | Todo API with full MVC architecture & MongoDB integration | `express.Router()`, Mongoose Schema/Model validation, async Controller, `Todo.create()`, `Todo.find({})`, `Todo.findById()`, `req.params`, Postman testing | 🟡 In Progress |
+| **02** | [`02`](./02) | Node.js, Express, Mongoose, MongoDB, Dotenv | Todo API with full MVC architecture & MongoDB integration | `express.Router()`, Mongoose Schema/Model validation, async Controller, `Todo.create()`, `Todo.find()`, `Todo.findByIdAndUpdate()`, `req.params`, Postman testing | 🟡 In Progress |
 
 ---
 
