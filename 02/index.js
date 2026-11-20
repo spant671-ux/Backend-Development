@@ -13,3 +13,8 @@ const todoRoutes = require('./routes/todos');
 
 //mount the todo API routes
 app.use("/api/v1", todoRoutes);
+
+//start server
+app.listen(PORT, () => {
+    console.log(`Server started at ${PORT}`);
+});
