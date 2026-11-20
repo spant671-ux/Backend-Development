@@ -15,6 +15,9 @@ exports.createComment = async (req, res) => {
 
         //save the object in database
         const savedComment = await comment.save();
+
+        //find the post by id, add the new comment to its comments array
+        const updatedPost = await Post.findByIdAndUpdate(post, { $push: {comments: savedComment._id} }, {new: true} )
     }
     catch(err){
 
