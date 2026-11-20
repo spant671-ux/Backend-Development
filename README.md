@@ -22,10 +22,19 @@ Backend Development/
 ├── .gitignore                   # Global ignore file (node_modules, .env)
 ├── README.md                    # Repository documentation and module matrix
 ├── notes.md                     # Centralized comprehensive study handbook
-└── 01/                          # Module 01: Server setup, Express instance, body-parser, routing & Mongoose
+├── 01/                          # Module 01: Server setup, Express instance, body-parser, routing & Mongoose
+│   ├── package.json
+│   ├── package-lock.json
+│   └── server.js
+└── 02/                          # Module 02: Full MVC Architecture & Todo API with MongoDB
+    ├── config/database.js
+    ├── controllers/createTodo.js
+    ├── models/Todo.js
+    ├── routes/todos.js
+    ├── .env
+    ├── index.js
     ├── package.json
-    ├── package-lock.json
-    └── server.js
+    └── package-lock.json
 ```
 
 ---
@@ -48,6 +57,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 9. **MongoDB Ecosystem (`mongosh` & Compass)** – Document databases vs SQL, BSON format, port `27017`, CLI shell management, and visual GUI inspection.
 10. **MongoDB CRUD Operations** – Document lifecycle: `insertOne`/`insertMany`, filtered queries with `find`/`findOne`, `$set` atomic updates, and `deleteOne`/`deleteMany`.
 11. **Database Connectivity with Mongoose** – `mongoose.connect()`, Promise-based handling, and IPv4 loopback (`127.0.0.1`) resolution in Node.js 18+.
+12. **MVC Architecture & Controller Pattern** – Separation of concerns across Models, Controllers, and Routes with async/await database operations and structured JSON responses.
 
 ---
 
@@ -56,6 +66,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 | # | Folder | Tech Stack | Description | Key Learnings | Status |
 |---|---|---|---|---|---|
 | **01** | [`01`](./01) | Node.js, Express 5, Body-Parser, Mongoose, MongoDB | Express server, REST endpoints & MongoDB database connection | `express()`, `app.listen()`, `GET /`, `POST /api/cars`, `bodyParser.json()`, `req.body`, Postman testing, `mongoose.connect()`, `127.0.0.1` IPv4 loopback resolution | ✅ Completed |
+| **02** | [`02`](./02) | Node.js, Express, Mongoose, MongoDB, Dotenv | Todo API with full MVC architecture & MongoDB integration | `express.Router()`, Mongoose Schema/Model validation, async Controller, `Todo.create()`, `dotenv`, Postman testing | 🟡 In Progress |
 
 ---
 

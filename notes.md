@@ -16,6 +16,7 @@ A structured companion covering core backend concepts, networking fundamentals, 
 8. [Setup & Running Commands](#8-setup--running-commands)
 9. [Introduction to MongoDB & Database Tools (mongosh & Compass)](#9-introduction-to-mongodb--database-tools-mongosh--compass)
 10. [MongoDB CRUD Operations (Create, Read, Update, Delete)](#10-mongodb-crud-operations-create-read-update-delete)
+11. [Module 02 — MVC Architecture & TODO API (Create Endpoint)](#11-module-02--mvc-architecture--todo-api-create-endpoint)
 
 ---
 
@@ -464,3 +465,225 @@ db.cars.deleteMany({ brand: "Honda" })
 // Warning: Clears all documents inside the collection
 db.cars.deleteMany({})
 ```
+
+---
+
+## 11. Module 02 — MVC Architecture & TODO API (Create Endpoint)
+
+### 1. What is MVC Architecture?
+In production backend engineering, putting all code (routes, database queries, and configuration) inside a single file quickly becomes unmaintainable. 
+
+**MVC (Model-View-Controller)** is an industry-standard architectural pattern that separates software into three distinct concerns:
+
+```text
+Client (Postman / Browser)
+         │
+         │ 1. HTTP Request (POST /api/v1/createTodo)
+         ▼
+┌──────────────────────────────────────────────┐
+│                  ROUTES                      │  Matches endpoint URL & HTTP method,
+│            (02/routes/todos.js)              │  forwards request to the appropriate controller.
+└──────────────────────┬───────────────────────┘
+                       │
+                       │ 2. Dispatches to
+                       ▼
+┌──────────────────────────────────────────────┐
+│                CONTROLLERS                   │  Handles business logic, extracts body data,
+│        (02/controllers/createTodo.js)        │  coordinates database operations via Model.
+└──────────────────────┬───────────────────────┘
+                       │
+                       │ 3. Queries / Inserts
+                       ▼
+┌──────────────────────────────────────────────┐
+│                  MODELS                      │  Defines data schema, validation rules,
+│           (02/models/Todo.js)                │  and communicates directly with MongoDB.
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+                MongoDB Database
+```
+
+---
+
+### 2. Project Folder Structure (`02/`)
+
+```text
+02/
+├── config/
+│   └── database.js       # Database connection with Mongoose & dotenv
+├── controllers/
+│   └── createTodo.js     # Business logic for creating a new Todo item
+├── models/
+│   └── Todo.js           # Mongoose Schema & Model definition
+├── routes/
+│   └── todos.js          # Express Router mapping paths to controllers
+├── .env                  # Environment variables (PORT, DATABASE_URL)
+├── index.js              # Server entry point & middleware mounting
+├── package.json
+└── package-lock.json
+```
+
+---
+
+### 3. Step-by-Step Implementation
+
+#### Step 1: Mongoose Schema & Model (`02/models/Todo.js`)
+Defines the structure, validation constraints, and default values of a document:
+
+```javascript
+const mongoose = require('mongoose');
+
+const todoSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+        maxLength: 50
+    },
+    description: {
+        type: String,
+        required: true,
+        maxLength: 50
+    },
+    createdAt: {
+        type: Date,
+        required: true,
+        default: Date.now()
+    },
+    updatedAt: {
+        type: Date,
+        required: true,
+        default: Date.now()
+    }
+});
+
+module.exports = mongoose.model("Todo", todoSchema);
+```
+
+#### Step 2: Controller Logic (`02/controllers/createTodo.js`)
+Extracts request body parameters, calls `Todo.create()`, and returns standard REST JSON:
+
+```javascript
+const Todo = require("../models/Todo");
+
+exports.createTodo = async (req, res) => {
+    try {
+        // 1. Extract data from request body
+        const { title, description } = req.body;
+
+        // 2. Insert new record into MongoDB
+        const response = await Todo.create({ title, description });
+
+        // 3. Send successful JSON response
+        res.status(200).json({
+            success: true,
+            data: response,
+            message: "Entry created successfully!"
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            data: "Internal server error!",
+            message: err.message
+        });
+    }
+};
+```
+
+#### Step 3: Express Router (`02/routes/todos.js`)
+Uses `express.Router()` to modularize endpoints:
+
+```javascript
+const express = require("express");
+const router = express.Router();
+
+const { createTodo } = require("../controllers/createTodo");
+
+// Map POST /createTodo to createTodo controller
+router.post("/createTodo", createTodo);
+
+module.exports = router;
+```
+
+#### Step 4: Environment Config & Database Connection (`02/config/database.js`)
+Keeps sensitive connection strings safe in `.env` and connects cleanly:
+
+```javascript
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const dbConnect = () => {
+    mongoose.connect(process.env.DATABASE_URL)
+    .then(() => console.log("DB connection successful!"))
+    .catch((error) => {
+        console.log("Issue in DB Connection!");
+        console.error(error.message);
+        process.exit(1);
+    });
+};
+
+module.exports = dbConnect;
+```
+
+#### Step 5: Mounting Everything in `02/index.js`
+Connects middleware, routes, database, and listener:
+
+```javascript
+const express = require('express');
+const app = express();
+
+require("dotenv").config();
+const PORT = process.env.PORT || 4000;
+
+// Body-parsing middleware
+app.use(express.json());
+
+// Mount Todo routes under /api/v1 prefix
+const todoRoutes = require('./routes/todos');
+app.use("/api/v1", todoRoutes);
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server started at ${PORT}`);
+});
+
+// Connect to MongoDB
+const dbConnect = require("./config/database");
+dbConnect();
+
+// Default home route
+app.get("/", (req, res) => {
+    res.send(`<h1>This is your homepage.</h1>`);
+});
+```
+
+---
+
+### 4. Testing with Postman
+
+1. **Method**: `POST`
+2. **URL**: `http://localhost:3000/api/v1/createTodo`
+3. **Headers**: `Content-Type: application/json`
+4. **Body (`raw` -> `JSON`)**:
+   ```json
+   {
+     "title": "Abir Pal",
+     "description": "Hello Abir Pal"
+   }
+   ```
+5. **Expected Response (Status `200 OK`)**:
+   ```json
+   {
+     "success": true,
+     "data": {
+       "title": "Abir Pal",
+       "description": "Hello Abir Pal",
+       "createdAt": "2026-11-20T11:53:32.611Z",
+       "updatedAt": "2026-11-20T11:53:32.611Z",
+       "_id": "6b0034f87a975d12852b2e71",
+       "__v": 0
+     },
+     "message": "Entry created successfully!"
+   }
+   ```
+
