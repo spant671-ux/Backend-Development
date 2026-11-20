@@ -727,7 +727,62 @@ exports.updateTodo = async (req, res) => {
 
 ---
 
-#### 6. The Vault & Plumber: `.env` & `02/config/database.js`
+#### 6. The Controller: Deleting a Todo (`02/controllers/deleteTodo.js`)
+To remove a record, we extract the target `id` from `req.params` and call `Todo.findByIdAndDelete(id)`:
+
+```javascript
+const Todo = require("../models/Todo");
+
+exports.deleteTodo = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find by ID and delete from MongoDB
+        await Todo.findByIdAndDelete(id);
+
+        res.json({
+            success: true,
+            message: "Todo deleted"
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            message: "Server Error"
+        });
+    }
+};
+```
+
+---
+
+#### 7. The Traffic Cop: Complete Routes (`02/routes/todos.js`)
+All 5 CRUD routes mapped to their respective controllers:
+
+```javascript
+const express = require("express");
+const router = express.Router();
+
+// Import controller functions
+const { createTodo } = require("../controllers/createTodo");
+const { getTodo, getTodoById } = require("../controllers/getTodo");
+const { updateTodo } = require("../controllers/updateTodo");
+const { deleteTodo } = require("../controllers/deleteTodo");
+
+// Define API routes (Full CRUD)
+router.post("/createTodo", createTodo);       // C - Create
+router.get("/getTodos", getTodo);             // R - Read All
+router.get("/getTodos/:id", getTodoById);     // R - Read by ID
+router.put("/updateTodo/:id", updateTodo);    // U - Update by ID
+router.delete("/deleteTodo/:id", deleteTodo); // D - Delete by ID
+
+module.exports = router;
+```
+
+---
+
+#### 8. The Vault & Plumber: `.env` & `02/config/database.js`
 **Rule**: Never commit database passwords or port numbers to public code.
 - `.env` stores environment variables:
   ```env
@@ -798,6 +853,7 @@ app.get("/", (req, res) => {
 | **GET /getTodos** | Select `GET` ➔ No Body | `http://localhost:3000/api/v1/getTodos`<br>Fetches and returns an array of all saved Todos. |
 | **GET /getTodos/:id** | Select `GET` ➔ URL Param | `http://localhost:3000/api/v1/getTodos/<id>`<br>Fetches a single Todo by its `_id`; returns `404` if not found. |
 | **PUT /updateTodo/:id** | Select `PUT` ➔ URL Param + Body | `http://localhost:3000/api/v1/updateTodo/<id>`<br>Updates title/description/updatedAt of the Todo. |
+| **DELETE /deleteTodo/:id** | Select `DELETE` ➔ URL Param | `http://localhost:3000/api/v1/deleteTodo/<id>`<br>Deletes the document matching the given `_id`. |
 
 ---
 
