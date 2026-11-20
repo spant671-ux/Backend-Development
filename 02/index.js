@@ -18,3 +18,12 @@ app.use("/api/v1", todoRoutes);
 app.listen(PORT, () => {
     console.log(`Server started at ${PORT}`);
 });
+
+//connect to the database
+const dbConnect = require("./config/database");
+dbConnect();
+
+//default route
+app.get("/", (req, res) => {
+    res.send(`<h1>This is your homepage.</h1>`)
+});
