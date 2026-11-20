@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 
-app.listen(3000, () => {
-    console.log("App is running successfully on port:3000")
-})
+//load config from env file
+require("dotenv").config();
+const PORT = process.env.PORT || 4000;
+
