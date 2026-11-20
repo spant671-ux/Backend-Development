@@ -598,18 +598,18 @@ exports.createTodo = async (req, res) => {
 
 ---
 
-#### 3. The Controller: Fetching All Todos (`02/controllers/getTodo.js`)
-To read documents from MongoDB, we use `Todo.find({})`. Passing an empty object `{}` tells Mongoose: *"find everything in this collection without filtering"*.
+#### 3. The Controller: Fetching Todos (`02/controllers/getTodo.js`)
+We have two ways to fetch data:
+1. **Fetch All**: `Todo.find({})` with an empty filter `{}` retrieves all documents.
+2. **Fetch By ID**: `Todo.findById(id)` queries MongoDB using the unique `_id` extracted from the URL (`req.params.id`). If the document does not exist, we return HTTP `404 Not Found`.
 
 ```javascript
 const Todo = require("../models/Todo");
 
+// 1. Fetch All Todos
 exports.getTodo = async (req, res) => {
     try {
-        // Fetch all todo documents from the database
         const todos = await Todo.find({});
-
-        // Send response with the fetched array of todos
         res.status(200).json({
             success: true,
             data: todos,
@@ -624,12 +624,43 @@ exports.getTodo = async (req, res) => {
         });
     }
 };
+
+// 2. Fetch Single Todo By ID
+exports.getTodoById = async (req, res) => {
+    try {
+        // Extract the id parameter from URL: /getTodos/:id
+        const id = req.params.id;
+        const todo = await Todo.findById({ _id: id });
+
+        // If no document matches the given ID -> return 404 Not Found
+        if (!todo) {
+            return res.status(404).json({
+                success: false,
+                message: "No data found in the given id"
+            });
+        }
+
+        // If found -> return 200 OK with the document
+        res.status(200).json({
+            success: true,
+            data: todo,
+            message: `Todo ${id} data successfully fetched`
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            success: false,
+            error: err.message,
+            message: "Server error"
+        });
+    }
+};
 ```
 
 ---
 
 #### 4. The Traffic Cop: `02/routes/todos.js`
-Routes should remain completely clean and readable. They only map an endpoint to a controller:
+Routes should remain completely clean and readable. They map endpoints to controllers, including dynamic route parameters (`:id`):
 
 ```javascript
 const express = require("express");
@@ -637,11 +668,12 @@ const router = express.Router();
 
 // Import controller functions
 const { createTodo } = require("../controllers/createTodo");
-const { getTodo } = require("../controllers/getTodo");
+const { getTodo, getTodoById } = require("../controllers/getTodo");
 
 // Define API routes
-router.post("/createTodo", createTodo); // Create new todo
-router.get("/getTodos", getTodo);       // Fetch all todos
+router.post("/createTodo", createTodo);    // Create new todo
+router.get("/getTodos", getTodo);          // Fetch all todos
+router.get("/getTodos/:id", getTodoById);  // Fetch single todo by ID (Dynamic Route Param)
 
 module.exports = router;
 ```
@@ -717,6 +749,7 @@ app.get("/", (req, res) => {
 | :--- | :--- | :--- |
 | **POST /createTodo** | Select `POST` ➔ Body: `raw JSON` | `http://localhost:3000/api/v1/createTodo`<br>Creates and saves a new Todo in MongoDB. |
 | **GET /getTodos** | Select `GET` ➔ No Body | `http://localhost:3000/api/v1/getTodos`<br>Fetches and returns an array of all saved Todos. |
+| **GET /getTodos/:id** | Select `GET` ➔ URL Param | `http://localhost:3000/api/v1/getTodos/<id>`<br>Fetches a single Todo by its `_id`; returns `404` if not found. |
 
 ---
 
@@ -724,6 +757,8 @@ app.get("/", (req, res) => {
 1. **Why do we need MVC?** To achieve **Separation of Concerns**—keeping database logic, routing, and configurations independent so teams can scale code cleanly.
 2. **Why use `async / await` in controllers?** Because database queries are asynchronous. Without `await`, JavaScript moves to the next line before MongoDB finishes saving or querying.
 3. **What does `Todo.find({})` do?** Passing an empty object `{}` tells Mongoose to query all documents in the collection without filtering.
-4. **What does `express.json()` do?** It parses raw incoming request streams into a ready-to-use `req.body` object.
-5. **Why use `.env`?** Keeps sensitive credentials and environment configurations out of source code and version control.
+4. **How do Route Parameters (`req.params`) work?** When a route contains `:id` (e.g., `/getTodos/:id`), Express extracts the value from the URL path into `req.params.id`.
+5. **What should an API return when an ID does not exist?** HTTP status **`404 Not Found`** with a clear error message, rather than a generic `500 Server Error`.
+6. **What does `express.json()` do?** It parses raw incoming request streams into a ready-to-use `req.body` object.
+7. **Why use `.env`?** Keeps sensitive credentials and environment configurations out of source code and version control.
 
