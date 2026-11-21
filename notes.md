@@ -252,36 +252,123 @@ module.exports = router;
 
 ---
 
-## Chapter 6: Relationships in MongoDB (Blog App Intro)
+## Chapter 6: Relationships in MongoDB (Module 03 — Blog App)
 
-### 6.1 Referencing via `ObjectId`
-In MongoDB, we link collections together using `mongoose.Schema.Types.ObjectId` and the `ref` attribute:
+### 6.1 Relational Modeling in NoSQL: Referencing via `ObjectId`
+In document databases, we link separate collections using `mongoose.Schema.Types.ObjectId` and the `ref` option (similar to Foreign Keys in SQL):
 
 ```javascript
-// Example: Post Model with Likes & Comments arrays
+// models/postModel.js
 const postSchema = new mongoose.Schema({
     title: { type: String, required: true },
     body: { type: String, required: true },
     likes: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Like"    // Refers to the Like Model
+        ref: "Like"    // Refers to the Like collection
     }],
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment" // Refers to the Comment Model
+        ref: "Comment" // Refers to the Comment collection
     }]
 });
 ```
 
-### 6.2 Route Mounting Rule
-In `index.js`, always prefix route paths with a leading slash:
-```javascript
-// ✅ CORRECT:
-app.use("/api/v1", blogRoutes);
+---
 
-// ❌ WRONG (Route will not match):
-app.use("api/v1", blogRoutes);
+### 6.2 The Two Array Update Operators: `$push` vs `$pull`
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                     ARRAY UPDATE OPERATORS                             │
+├─────────┬───────────────────────────┬──────────────────────────────────┤
+│ $push   │ Appends an element/ID     │ Post.findByIdAndUpdate(          │
+│         │ to an array               │   postId,                        │
+│         │ (Used when Liking /       │   { $push: { likes: likeId } },  │
+│         │ Commenting)               │   { new: true }                  │
+│         │                           │ )                                │
+├─────────┼───────────────────────────┼──────────────────────────────────┤
+│ $pull   │ Removes matching element  │ Post.findByIdAndUpdate(          │
+│         │ / ID from an array        │   postId,                        │
+│         │ (Used when Unliking)      │   { $pull: { likes: likeId } },  │
+│         │                           │   { new: true }                  │
+│         │                           │ )                                │
+└─────────┴───────────────────────────┴──────────────────────────────────┘
 ```
+
+---
+
+### 6.3 Query Hydration: `.populate()` (The NoSQL JOIN)
+By default, MongoDB only stores the 24-character hexadecimal `_id` string inside reference arrays.
+
+To replace those raw IDs with the **actual populated documents**, chain `.populate()`:
+
+```javascript
+// Fetches all posts AND replaces IDs in likes & comments with full documents!
+const posts = await Post.find()
+    .populate("likes")
+    .populate("comments")
+    .exec();
+```
+
+---
+
+### 6.4 The 3 Core Controller Patterns in Blog App
+
+#### Pattern A: Adding a Child Reference (Comment or Like)
+1. Extract data from `req.body`.
+2. Create and `.save()` the child object (`new Comment(...)` or `new Like(...)`).
+3. Update the parent post using `$push` to insert the new child's `_id`.
+4. Return the updated post (hydrated via `.populate()`).
+
+```javascript
+// controllers/commentController.js
+const comment = new Comment({ post, user, body });
+const savedComment = await comment.save();
+
+const updatedPost = await Post.findByIdAndUpdate(
+    post,
+    { $push: { comments: savedComment._id } },
+    { new: true }
+).populate("comments").exec();
+```
+
+#### Pattern B: Removing a Child Reference (Unlike)
+1. Extract `{ post, like }` from `req.body`.
+2. Delete the Like document: `Like.findOneAndDelete({ post: post, _id: like })`.
+3. Update the parent post using `$pull` to remove `deletedLike._id` from `post.likes`.
+
+```javascript
+// controllers/likeController.js
+const deletedLike = await Like.findOneAndDelete({ post: post, _id: like });
+
+const updatedPost = await Post.findByIdAndUpdate(
+    post,
+    { $pull: { likes: deletedLike._id } },
+    { new: true }
+);
+```
+
+#### Pattern C: Creating & Fetching Parent Posts
+```javascript
+// controllers/postController.js
+exports.createPost = async (req, res) => {
+    const { title, body } = req.body;
+    const post = new Post({ title, body });
+    const savedPost = await post.save();
+    res.json({ post: savedPost });
+};
+```
+
+---
+
+### 6.5 Module 03 API Endpoints Matrix (Postman Testing)
+| HTTP Method | Route URL | Purpose | Body Payload |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/posts/create` | Create a new blog post | `{ "title": "My Post", "body": "Content" }` |
+| `GET` | `/api/v1/posts` | Fetch all posts (hydrated) | None |
+| `POST` | `/api/v1/comments/create` | Add comment to a post | `{ "post": "<post_id>", "user": "User", "body": "Nice!" }` |
+| `POST` | `/api/v1/likes/like` | Like a post | `{ "post": "<post_id>", "user": "User" }` |
+| `POST` | `/api/v1/likes/unlike` | Remove like from a post | `{ "post": "<post_id>", "like": "<like_id>" }` |
 
 ---
 
@@ -321,3 +408,9 @@ Write these in red ink in your notebook:
 
 10. **Case Sensitivity in Imports**:
     - On Windows, file paths are case-insensitive, but on Linux (production/Docker), `require("../controllers/LikeController")` will crash if the file is `likeController.js`. Always match exact file name casing!
+
+11. **MongoDB Operators Need `$` Prefix**:
+    - Writing `{ push: { likes: id } }` fails silently or creates a literal field named `push`. Always write `{ $push: ... }` and `{ $pull: ... }`.
+
+12. **Mongoose `CastError` on Invalid `ObjectId`**:
+    - An `ObjectId` must be a valid 24-character hexadecimal string (`0-9`, `a-f`). Passing a random string throws an immediate unhandled exception if not caught in `try/catch`.

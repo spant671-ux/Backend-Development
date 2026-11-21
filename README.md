@@ -26,11 +26,26 @@ Backend Development/
 │   ├── package.json
 │   ├── package-lock.json
 │   └── server.js
-└── 02/                          # Module 02: Full MVC Architecture & Todo API with MongoDB
+├── 02/                          # Module 02: Full MVC Architecture & Todo CRUD API with MongoDB
+│   ├── config/database.js
+│   ├── controllers/
+│   ├── models/Todo.js
+│   ├── routes/todos.js
+│   ├── .env
+│   ├── index.js
+│   ├── package.json
+│   └── package-lock.json
+└── 03/                          # Module 03: Blog App with MongoDB Relationships, $push/$pull & .populate()
     ├── config/database.js
-    ├── controllers/createTodo.js
-    ├── models/Todo.js
-    ├── routes/todos.js
+    ├── controllers/
+    │   ├── commentController.js
+    │   ├── likeController.js
+    │   └── postController.js
+    ├── models/
+    │   ├── commentModel.js
+    │   ├── likeModel.js
+    │   └── postModel.js
+    ├── routes/blog.js
     ├── .env
     ├── index.js
     ├── package.json
@@ -67,6 +82,7 @@ All theoretical foundations, networking mechanisms, protocol lifecycle rules, co
 |---|---|---|---|---|---|
 | **01** | [`01`](./01) | Node.js, Express 5, Body-Parser, Mongoose, MongoDB | Express server, REST endpoints & MongoDB database connection | `express()`, `app.listen()`, `GET /`, `POST /api/cars`, `bodyParser.json()`, `req.body`, Postman testing, `mongoose.connect()`, `127.0.0.1` IPv4 loopback resolution | ✅ Completed |
 | **02** | [`02`](./02) | Node.js, Express, Mongoose, MongoDB, Dotenv | Complete Todo CRUD API with full MVC architecture & MongoDB integration | `express.Router()`, Mongoose Schema/Model validation, async Controllers, `Todo.create()`, `find()`, `findById()`, `findByIdAndUpdate()`, `findByIdAndDelete()`, `req.params`, Postman verification | ✅ Completed |
+| **03** | [`03`](./03) | Node.js, Express, Mongoose, MongoDB, Dotenv | Blog App with relational document references, Likes & Comments | Schema references (`ObjectId`, `ref`), `$push` (liking/commenting), `$pull` (unliking), `.populate()` query hydration, `findOneAndDelete()` | ✅ Completed |
 
 ---
 
