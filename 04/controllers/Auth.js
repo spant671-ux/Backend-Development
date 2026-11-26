@@ -27,6 +27,22 @@ exports.signup = async (req, res) => {
                 message: "Error in hashing password"
             });
         }
+
+        //create entry for User
+        const user = await User.create({
+            name, email, password:hashedPassword, role
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "User created successfully"
+        });
     }
-    catch(err){}
+    catch(err){
+        console.error(err);
+        return res.status(500).json({
+            success: false,
+            message: "User can not be registered, Please try again later"
+        })
+    }
 }
