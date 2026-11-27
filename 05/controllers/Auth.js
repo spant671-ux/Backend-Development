@@ -63,10 +63,10 @@ exports.login = async (req, res) => {
             });
         }
         //check for registered user
-        const user = await User.findOne({email})
+        let user = await User.findOne({email});
         //if not a registered user
         if(!user){
-            return res.status(401), json({
+            return res.status(401).json({
                 success: false,
                 message: "User is not registered"
             });
@@ -86,6 +86,7 @@ exports.login = async (req, res) => {
                 {
                     expiresIn: "2h"
                 });
+            user = user.toObject();
             user.token = token;
             user.password = undefined;
 
