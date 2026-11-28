@@ -35,9 +35,9 @@ exports.auth = (req, res, next) => {
     }
 }
 
-exports.isStudent = (req, res) => {
+exports.isStudent = (req, res, next) => {
     try{
-        if(req.role !== "Student"){
+        if(req.user.role !== "Student"){
             return res.status(401).json({
                 success: false,
                 message: "This is a protected route for students"
@@ -52,9 +52,9 @@ exports.isStudent = (req, res) => {
     }
 }
 
-exports.isAdmin = (req, res) => {
+exports.isAdmin = (req, res, next) => {
     try{
-        if(req.role !== "Admin"){
+        if(req.user.role !== "Admin"){
             return res.status(401).json({
                 success: false,
                 message: "This is a protected route for admin"
