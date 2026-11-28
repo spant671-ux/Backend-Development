@@ -24,7 +24,13 @@ exports.auth = (req, res, next) => {
             return res.status(401).json({
                 success: false,
                 message: "Token is invalid"
-            })
+            });
         }
-    } catch(error){}
+        next();
+    } catch(error){
+        return res.status(401).json({
+            success: false,
+            message: "Something went wrong while verifying token"
+        });
+    }
 }
