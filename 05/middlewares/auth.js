@@ -34,3 +34,37 @@ exports.auth = (req, res, next) => {
         });
     }
 }
+
+exports.isStudent = (req, res) => {
+    try{
+        if(req.role !== "Student"){
+            return res.status(401).json({
+                success: false,
+                message: "This is a protected route for students"
+            })
+        }
+        next();
+    } catch(error) {
+        return res.status(500).json({
+            success: false,
+            message: "User role is not matching"
+        });
+    }
+}
+
+exports.isAdmin = (req, res) => {
+    try{
+        if(req.role !== "Admin"){
+            return res.status(401).json({
+                success: false,
+                message: "This is a protected route for admin"
+            })
+        }
+        next();
+    } catch(error) {
+        return res.status(500).json({
+            success: false,
+            message: "User role is not matching"
+        });
+    }
+}
